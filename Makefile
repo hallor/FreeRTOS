@@ -63,12 +63,13 @@ LPCRC=lpcrc/lpcrc
 TARGET=cortex-m3
 
 WARNINGS=-Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wsign-compare \
-		-Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wunused
+		-Waggregate-return -Wstrict-prototypes -Wmissing-declarations -Wunused
+# -Wmissing-prototypes
 
 #
 # CFLAGS common to both the THUMB and ARM mode builds
 #
-CFLAGS=$(WARNINGS) -D__NEWLIB__  $(DEBUG) -mcpu=$(TARGET) -T$(LDSCRIPT) \
+CFLAGS=$(WARNINGS) -D__NEWLIB__  $(DEBUG) -mcpu=$(TARGET) -T$(LDSCRIPT) -std=gnu99\
 		 $(OPTIM) -fomit-frame-pointer -fno-strict-aliasing -mthumb \
 		 -Isrc -Ikernel/include -Ikernel/portable/GCC/ARM_CM3 -Idrivers
 
@@ -84,7 +85,7 @@ SRC += kernel/portable/MemMang/heap_1.c # Malloc
 SRC += kernel/portable/GCC/ARM_CM3/port.c # core support
 
 # Drivers
-SRC +=
+SRC += drivers/cpu.c drivers/gpio.c
 
 # Boot files
 SRC += boot/irqv.c boot/startup.c
@@ -95,7 +96,8 @@ all: rtos.bin
 
 program: all
 	mdel -i /dev/disk/by-id/usb-NXP_LPC134X_IFLASH_ISP000000000-0\:0 ::/firmware.bin
-	mcopy -i /dev/disk/by-id/usb-NXP_LPC134X_IFLASH_ISP000000000-0\:0 rtosdemo.bin ::/
+	mcopy -i /dev/disk/by-id/usb-NXP_LPC134X_IFLASH_ISP000000000-0\:0 rtos.bin ::/
+	sync
 	eject /dev/disk/by-id/usb-NXP_LPC134X_IFLASH_ISP000000000-0\:0
 
 rtos.bin : rtos.elf crc
