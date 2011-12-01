@@ -50,75 +50,65 @@
 #    http://www.OpenRTOS.com - Commercial support, development, porting,
 #    licensing and training services.
 #*/
-USE_THUMB_MODE=YES
 OPTIM=-O2
 LDSCRIPT=memory.ld
 
-CC=arm-none-eabi-gcc
-OBJCOPY=arm-none-eabi-objcopy
-ARCH=arm-none-eabi-ar
+CROSS_COMPILE=arm-none-eabi-
+
+CC=$(CROSS_COMPILE)gcc
+OBJCOPY=$(CROSS_COMPILE)objcopy
+ARCH=$(CROSS_COMPILE)ar
+CRC=./lpcrc
+
+TARGET=cortex-m3
+
 WARNINGS=-Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wsign-compare \
 		-Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wunused
 
 #
 # CFLAGS common to both the THUMB and ARM mode builds
 #
-CFLAGS=$(WARNINGS) -I. -I../../Source/include -I../../Source/portable/GCC/ARM_CM3 -D__NEWLIB__\
-    -I../Common/include $(DEBUG) -mcpu=cortex-m3 -T$(LDSCRIPT) \
-     $(OPTIM) -fomit-frame-pointer -fno-strict-aliasing #-fno-dwarf2-cfi-asm
+CFLAGS=$(WARNINGS) -D__NEWLIB__  $(DEBUG) -mcpu=$(TARGET) -T$(LDSCRIPT) \
+		 $(OPTIM) -fomit-frame-pointer -fno-strict-aliasing -mthumb \
+		 -Isrc -Ikernel/include -Ikernel/portable/GCC/ARM_CM3
 
-  CFLAGS += -mthumb
 
-LINKER_FLAGS=-Xlinker -ortosdemo.elf -Xlinker -M -Xlinker -Map=rtosdemo.map
+LINKER_FLAGS=-Xlinker -o rtos.elf -Xlinker -M -Xlinker -Map=rtos.map
 
-RTOS_SOURCE_DIR=../../Source
-DEMO_SOURCE_DIR=../Common/Minimal
-#
-# Source files that can be built to THUMB mode.
-#
-THUMB_SRC = \
-main.c \
-$(DEMO_SOURCE_DIR)/integer.c \
-$(DEMO_SOURCE_DIR)/PollQ.c \
-$(DEMO_SOURCE_DIR)/flop.c \
-$(DEMO_SOURCE_DIR)/dynamic.c \
-$(DEMO_SOURCE_DIR)/BlockQ.c \
-$(RTOS_SOURCE_DIR)/tasks.c \
-$(RTOS_SOURCE_DIR)/queue.c \
-$(RTOS_SOURCE_DIR)/list.c \
-$(RTOS_SOURCE_DIR)/portable/MemMang/heap_2.c \
-$(RTOS_SOURCE_DIR)/portable/GCC/ARM_CM3/port.c
+# Applications
+SRC := src/main.c
 
-#
-# Source files that must be built to ARM mode.
-#
-ARM_SRC = LPC13xx_handlers.c LPC1xxx_startup.c system_LPC13xx.c core_cm3.c
+# Kernel
+SRC += kernel/croutine.c kernel/list.c kernel/queue.c kernel/tasks.c kernel/timers.c
+SRC += kernel/portable/MemMang/heap_1.c # Malloc
+SRC += kernel/portable/GCC/ARM_CM3/port.c # core support
 
-#
-# Define all object files.
-#
-ARM_OBJ = $(ARM_SRC:.c=.o)
-THUMB_OBJ = $(THUMB_SRC:.c=.o)
+# Drivers
+SRC +=
 
-all: rtosdemo.bin
+# Boot files
+SRC += boot/irqv.c boot/startup.c
 
-rtosdemo.bin : rtosdemo.elf
-	$(OBJCOPY) rtosdemo.elf -O binary rtosdemo.bin
+OBJ = $(SRC:.c=.o)
 
-rtosdemo.hex : rtosdemo.elf
-	$(OBJCOPY) rtosdemo.elf -O ihex rtosdemo.hex
+all: rtos.bin
 
-rtosdemo.elf : $(ARM_OBJ) $(THUMB_OBJ) Makefile
-	$(CC) $(CFLAGS) $(ARM_OBJ) $(THUMB_OBJ) -nostartfiles $(LINKER_FLAGS)
+rtos.bin : rtos.elf lpcrc
+	$(OBJCOPY) rtos.elf -O binary rtos.bin
+	$(LPCRC) rtos.bin
 
-$(THUMB_OBJ) : %.o : %.c $(LDSCRIPT) Makefile
-	$(CC) -c $(THUMB_FLAGS) $(CFLAGS) $< -o $@
+lpcrc: lpcrc/Makefile lpcrc/lpcrc.c
+	make -C lpcrc
+	mv lpcrc/lpcrc .
+
+rtos.elf : $(OBJ) Makefile
+	$(CC) $(CFLAGS) $(OBJ) -nostartfiles $(LINKER_FLAGS)
 
 $(ARM_OBJ) : %.o : %.c $(LDSCRIPT) Makefile
 	$(CC) -c $(CFLAGS) $< -o $@
 
 clean :
-	rm -rf $(ARM_OBJ) $(THUMB_OBJ)
+	rm -rf $(OBJ) rtos.bin rtos.elf rtos.map
 	touch Makefile
 
 
