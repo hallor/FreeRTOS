@@ -70,7 +70,7 @@ WARNINGS=-Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align
 #
 CFLAGS=$(WARNINGS) -D__NEWLIB__  $(DEBUG) -mcpu=$(TARGET) -T$(LDSCRIPT) \
 		 $(OPTIM) -fomit-frame-pointer -fno-strict-aliasing -mthumb \
-		 -Isrc -Ikernel/include -Ikernel/portable/GCC/ARM_CM3
+		 -Isrc -Ikernel/include -Ikernel/portable/GCC/ARM_CM3 -Idrivers
 
 
 LINKER_FLAGS=-Xlinker -ortos.elf -Xlinker -M -Xlinker -Map=rtos.map

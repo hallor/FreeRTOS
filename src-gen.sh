@@ -10,7 +10,7 @@ eom
 }
 
 function generate_dirs {
-dirs=`find $DIRS -mindepth 1 -type d | tr "\n" " " | grep -v Demo`
+dirs=`find $DIRS -type d | tr "\n" " " | grep -v Demo`
 echo "DEPENDPATH += . ${dirs}"
 echo "INCLUDEPATH += . ${dirs}"
 echo ""

@@ -100,7 +100,5 @@ to exclude the API function. */
 /* Priority 5, or 160 as only the top three bits are implemented. */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 	( 5 << (8 - configPRIO_BITS) )
 
-
-
 #endif /* FREERTOS_CONFIG_H */
 
