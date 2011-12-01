@@ -58,7 +58,7 @@ CROSS_COMPILE=arm-none-eabi-
 CC=$(CROSS_COMPILE)gcc
 OBJCOPY=$(CROSS_COMPILE)objcopy
 ARCH=$(CROSS_COMPILE)ar
-CRC=./lpcrc
+LPCRC=lpcrc/lpcrc
 
 TARGET=cortex-m3
 
@@ -73,7 +73,7 @@ CFLAGS=$(WARNINGS) -D__NEWLIB__  $(DEBUG) -mcpu=$(TARGET) -T$(LDSCRIPT) \
 		 -Isrc -Ikernel/include -Ikernel/portable/GCC/ARM_CM3
 
 
-LINKER_FLAGS=-Xlinker -o rtos.elf -Xlinker -M -Xlinker -Map=rtos.map
+LINKER_FLAGS=-Xlinker -ortos.elf -Xlinker -M -Xlinker -Map=rtos.map
 
 # Applications
 SRC := src/main.c
@@ -93,13 +93,17 @@ OBJ = $(SRC:.c=.o)
 
 all: rtos.bin
 
-rtos.bin : rtos.elf lpcrc
+program: all
+	mdel -i /dev/disk/by-id/usb-NXP_LPC134X_IFLASH_ISP000000000-0\:0 ::/firmware.bin
+	mcopy -i /dev/disk/by-id/usb-NXP_LPC134X_IFLASH_ISP000000000-0\:0 rtosdemo.bin ::/
+	eject /dev/disk/by-id/usb-NXP_LPC134X_IFLASH_ISP000000000-0\:0
+
+rtos.bin : rtos.elf crc
 	$(OBJCOPY) rtos.elf -O binary rtos.bin
 	$(LPCRC) rtos.bin
 
-lpcrc: lpcrc/Makefile lpcrc/lpcrc.c
+crc: $(LPCRC)
 	make -C lpcrc
-	mv lpcrc/lpcrc .
 
 rtos.elf : $(OBJ) Makefile
 	$(CC) $(CFLAGS) $(OBJ) -nostartfiles $(LINKER_FLAGS)

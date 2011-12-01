@@ -1,2 +1,5 @@
 Demo
 *.o
+rtos.bin
+rtos.map
+rtos.elf

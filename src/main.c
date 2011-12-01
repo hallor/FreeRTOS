@@ -1,10 +1,17 @@
 #include <FreeRTOS.h>
+
+unsigned int SystemCoreClock=12000000;
+
 static inline void __NOP(void)
-{ asm volatile ("nop"); }
+{
+  asm volatile ("nop");
+}
+
+
 int main(void)
 {
-    while (1)
-    {
-        __NOP();
-    }
+  while (1)
+  {
+    __NOP();
+  }
 }
