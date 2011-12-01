@@ -40,7 +40,7 @@ extern void main(void);
 
 // The entry point of the application, prepare segments,
 // initialize the cpu and execute main()
-void boot_entry()
+static void boot_entry(void)
 {
   register unsigned char *src, *dst;
 

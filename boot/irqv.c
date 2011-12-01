@@ -43,7 +43,7 @@
  * are weakly aliased which means that (re)definitions will overide these.
  *****************************************************************************/
 
-void irq_undefined()
+static void irq_undefined(void)
 {
   // Do nothing when occured interrupt is not defined, just keep looping
   while(1);
@@ -73,7 +73,7 @@ void WAKEUP_IRQHandler(void)    WEAK_ALIAS(irq_undefined);
  * are weakly aliased which means that (re)definitions will overide these.
  ****************************************************************************/
 
-void fault_undefined()
+static void fault_undefined(void)
 {
   // Do nothing when occured interrupt is not defined, just keep looping
   while(1);

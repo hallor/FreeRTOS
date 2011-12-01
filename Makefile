@@ -109,7 +109,6 @@ $(ARM_OBJ) : %.o : %.c $(LDSCRIPT) Makefile
 
 clean :
 	rm -rf $(OBJ) rtos.bin rtos.elf rtos.map
-	touch Makefile
 
 
 
