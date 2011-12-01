@@ -98,6 +98,10 @@ void SysTick_Handler(void)      WEAK_ALIAS(fault_undefined);
 extern void* stack_entry;
 extern void boot_entry(void);
 
+extern void vPortSVCHandler(void);
+extern void xPortPendSVHandler(void);
+extern void xPortSysTickHandler(void);
+
 // Defined irq vectors using simple c code following the description in a white 
 // paper from ARM[3] and code example from Simonsson Fun Technologies[4].
 // These vectors are placed at the memory location defined in the linker script
@@ -117,11 +121,11 @@ const void *vectors[] SECTION(".irq_vectors") =
   0,                     // Reserved
   0,                     // Reserved
   0,                     // Reserved
-  SVCall_Handler,        // SVCall handler
+  vPortSVCHandler,//SVCall_Handler,        // SVCall handler
   DebugMon_Handler,      // Debug monitor handler
   0,                     // Reserved
-  PendSV_Handler,        // The PendSV handler
-  SysTick_Handler,       // The SysTick handler
+  xPortPendSVHandler,//PendSV_Handler,        // The PendSV handler
+  xPortSysTickHandler,//SysTick_Handler,       // The SysTick handler
   
   // Wakeup I/O pins handlers
   WAKEUP_IRQHandler,     // PIO0_0  Wakeup

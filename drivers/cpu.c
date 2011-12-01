@@ -75,6 +75,8 @@
 
 */
 /**************************************************************************/
+extern unsigned int SystemCoreClock = 72000000;
+
 void cpuPllSetup (cpuMultiplier_t multiplier)
 {
   uint32_t i;

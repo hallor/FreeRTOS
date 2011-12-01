@@ -1,0 +1,1 @@
+ATTRS{model}=="LPC134X IFLASH", SUBSYSTEM=="block", OWNER="hallor"

@@ -63,8 +63,8 @@ LPCRC=lpcrc/lpcrc
 TARGET=cortex-m3
 
 WARNINGS=-Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wsign-compare \
-		-Waggregate-return -Wstrict-prototypes -Wmissing-declarations -Wunused
-# -Wmissing-prototypes
+		-Waggregate-return -Wstrict-prototypes -Wunused
+# -Wmissing-prototypes -Wmissing-declarations
 
 #
 # CFLAGS common to both the THUMB and ARM mode builds
